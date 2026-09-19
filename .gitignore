@@ -1,0 +1,27 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Source data and generated research artifacts
+data/
+artifacts/eda/*.csv
+artifacts/eda/*.png
+artifacts/eda/*.parquet
+artifacts/eda/*.json
+artifacts/eda/*.html
+!artifacts/eda/.gitkeep
+
+# Python and Jupyter runtime files
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Later-stage heavyweight artifacts
+*.npy
+mlruns/
+models/
