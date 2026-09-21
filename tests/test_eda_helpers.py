@@ -18,6 +18,7 @@ from calmfruits.eda import (  # noqa: E402
     missing_profile,
     select_mvp_root_categories,
 )
+from calmfruits.evaluation import _query_metrics, build_golden_set, split_queries  # noqa: E402
 
 
 class EDAHelperTests(unittest.TestCase):
@@ -58,6 +59,29 @@ class EDAHelperTests(unittest.TestCase):
         result = select_mvp_root_categories(products, queries, top_n=3)
 
         self.assertEqual(result["subj_root_name"].tolist(), ["Обувь", "Одежда"])
+
+    def test_metrics_preserve_unreachable_relevance_in_recall_and_ndcg(self) -> None:
+        metrics = _query_metrics([2, 3], {1: 3, 2: 2}, {2, 3})
+
+        self.assertEqual(metrics["reachable_relevant_share"], 0.5)
+        self.assertEqual(metrics["recall_at_1"], 0.5)
+        self.assertLess(metrics["ndcg_upper_bound_at_10"], 1)
+
+    def test_group_split_keeps_duplicate_normalized_text_together(self) -> None:
+        queries = pd.DataFrame({
+            "query_id": ["q1", "q1", "q2", "q2", "q3", "q3", "q4", "q4", "q5", "q5"],
+            "query_text": ["Кеды", "Кеды", " кеды ", " кеды ", "Брюки", "Брюки", "Платье", "Платье", "Шуба", "Шуба"],
+            "item_id": [1, 2] * 5,
+            "relevance": [3, 1] * 5,
+        })
+
+        split = split_queries(queries)
+        golden = build_golden_set(queries, split)
+        development_texts = set(split.loc[split["split"].eq("development"), "normalized_query_text"])
+        validation_texts = set(split.loc[split["split"].eq("validation"), "normalized_query_text"])
+
+        self.assertTrue(development_texts.isdisjoint(validation_texts))
+        self.assertEqual(golden.query_id.nunique(), split["split"].eq("validation").sum())
 
 
 if __name__ == "__main__":

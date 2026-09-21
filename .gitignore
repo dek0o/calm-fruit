@@ -11,6 +11,9 @@ artifacts/eda/*.parquet
 artifacts/eda/*.json
 artifacts/eda/*.html
 !artifacts/eda/.gitkeep
+artifacts/catalog/
+artifacts/indexes/
+artifacts/evaluation/
 
 # Python and Jupyter runtime files
 __pycache__/
