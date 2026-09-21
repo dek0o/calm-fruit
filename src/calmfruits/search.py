@@ -83,7 +83,8 @@ class SemanticSearch:
     @classmethod
     def fit(cls, catalog: pd.DataFrame, model_name: str = SEMANTIC_MODEL, batch_size: int = SEMANTIC_BATCH_SIZE) -> "SemanticSearch":
         model = SentenceTransformer(model_name, revision=SEMANTIC_REVISION, device="cpu")
-        embeddings = model.encode(catalog.product_text.tolist(), batch_size=batch_size, normalize_embeddings=True, convert_to_numpy=True, show_progress_bar=False).astype(np.float32)
+        product_inputs = catalog.product_text.map(clean_query).tolist()
+        embeddings = model.encode(product_inputs, batch_size=batch_size, normalize_embeddings=True, convert_to_numpy=True, show_progress_bar=False).astype(np.float32)
         return cls(catalog, model, embeddings)
 
     def search_semantic(self, query: object, top_k: int) -> pd.DataFrame:
@@ -95,7 +96,7 @@ class SemanticSearch:
 
     def truncation_statistics(self, texts: list[str]) -> pd.DataFrame:
         tokenizer = self.model.tokenizer
-        lengths = [len(tokenizer(text, add_special_tokens=True, truncation=False)["input_ids"]) for text in texts]
+        lengths = [len(tokenizer(clean_query(text), add_special_tokens=True, truncation=False)["input_ids"]) for text in texts]
         limit = int(self.model.max_seq_length)
         return pd.DataFrame({"texts": [len(lengths)], "max_seq_length": [limit], "median_tokens": [float(np.median(lengths))], "p95_tokens": [float(np.quantile(lengths, .95))], "max_tokens": [int(max(lengths, default=0))], "truncated_share": [float(np.mean(np.asarray(lengths) > limit))]})
 

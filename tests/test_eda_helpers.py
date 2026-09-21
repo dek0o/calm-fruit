@@ -19,6 +19,7 @@ from calmfruits.eda import (  # noqa: E402
     select_mvp_root_categories,
 )
 from calmfruits.evaluation import _query_metrics, build_golden_set, split_queries  # noqa: E402
+from calmfruits.catalog import clean_query  # noqa: E402
 
 
 class EDAHelperTests(unittest.TestCase):
@@ -82,6 +83,9 @@ class EDAHelperTests(unittest.TestCase):
 
         self.assertTrue(development_texts.isdisjoint(validation_texts))
         self.assertEqual(golden.query_id.nunique(), split["split"].eq("validation").sum())
+
+    def test_query_normalization_is_case_invariant_for_semantic_inputs(self) -> None:
+        self.assertEqual(clean_query("Кроссовки NIKE"), clean_query("кроссовки nike"))
 
 
 if __name__ == "__main__":
