@@ -1,0 +1,38 @@
+{
+  "fingerprints": {
+    "baseline_manifest": "39515dd885e2c296fea59d300a79bd5e929507cf2cb05157b6e213c1d4ad088d",
+    "catalog": "1d23d0cdb2856a538de5fa8e2590887b5eff3d890ae934464b4ffef3285926e8",
+    "golden": "9a36bd9a8e3418bd1222c11f88857bfe6677dfc0864ba99544175af9ce1ef46d",
+    "split": "51874816b5b4da2c10b4c718bf7299548d792c7b98aebc7e1aae7dba06f1169e"
+  },
+  "run_ids": {
+    "hybrid_rrf": "8e2fe62fbd614af191c66a387e439eeb",
+    "lexical": "12fc2b3407e9429fb95babd7b7ebde01",
+    "semantic_full_text": "1daf6f71e68a41fa85d54d4344537e30",
+    "semantic_projected": "5b7f5f2d09874c73a2b536b3cdf92324",
+    "semantic_short_text": "250246c7205f44999e6be9bb61992a80"
+  },
+  "selected_alpha": 0.25,
+  "selection_rule": "max ndcg_at_10, then mrr, then preference",
+  "winner": {
+    "hit_rate_at_1": 0.25,
+    "hit_rate_at_10": 0.6285714285714286,
+    "hit_rate_at_3": 0.44285714285714284,
+    "hit_rate_at_5": 0.5142857142857142,
+    "method": "lexical",
+    "mrr": 0.3760567603008099,
+    "ndcg_at_1": 0.26734693877551025,
+    "ndcg_at_10": 0.43697234615101577,
+    "ndcg_at_3": 0.3671697004058974,
+    "ndcg_at_5": 0.40752075698686346,
+    "precision_at_1": 0.25,
+    "precision_at_10": 0.1242857142857143,
+    "precision_at_3": 0.20238095238095238,
+    "precision_at_5": 0.16714285714285715,
+    "preference": 0,
+    "recall_at_1": 0.13760750454027765,
+    "recall_at_10": 0.5290841336534614,
+    "recall_at_3": 0.2869126496752547,
+    "recall_at_5": 0.37767491612029425
+  }
+}

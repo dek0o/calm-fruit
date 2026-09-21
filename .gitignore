@@ -14,6 +14,8 @@ artifacts/eda/*.html
 artifacts/catalog/
 artifacts/indexes/
 artifacts/evaluation/
+artifacts/experiments/
+artifacts/final/
 
 # Python and Jupyter runtime files
 __pycache__/

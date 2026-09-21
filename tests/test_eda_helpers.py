@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import sys
 from pathlib import Path
+import tempfile
 import unittest
 
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -20,6 +22,8 @@ from calmfruits.eda import (  # noqa: E402
 )
 from calmfruits.evaluation import _query_metrics, build_golden_set, split_queries  # noqa: E402
 from calmfruits.catalog import clean_query  # noqa: E402
+from calmfruits.experiments import HybridSearch, apply_projection, train_shared_projection  # noqa: E402
+from calmfruits.final import run_final_once  # noqa: E402
 
 
 class EDAHelperTests(unittest.TestCase):
@@ -86,6 +90,36 @@ class EDAHelperTests(unittest.TestCase):
 
     def test_query_normalization_is_case_invariant_for_semantic_inputs(self) -> None:
         self.assertEqual(clean_query("Кроссовки NIKE"), clean_query("кроссовки nike"))
+
+    def test_final_checkpoint_does_not_rerun_completed_test(self) -> None:
+        test = pd.DataFrame({"query_id": ["q1", "q1"], "query_text": ["ботинки", "ботинки"], "item_id": [1, 2], "relevance": [3, 1]})
+        catalog_ids = pd.Index([1, 2])
+        calls = []
+
+        def search(query, top_k):
+            calls.append((query, top_k))
+            return pd.DataFrame({"rank": [1, 2], "imt_id": [1, 2], "score": [1.0, 0.5], "imt_name": ["Ботинки", "Туфли"], "subj_name": ["Ботинки", "Туфли"], "description": ["", ""]})
+
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            first = run_final_once(search, test, catalog_ids, {"method": "lexical"}, directory)
+            second = run_final_once(search, test, catalog_ids, {"method": "lexical"}, directory)
+
+        self.assertEqual(len(calls), 1)
+        self.assertTrue(first[2].equals(second[2]))
+
+    def test_projection_preserves_unit_norm_and_trains_shared_matrix(self) -> None:
+        anchors = np.array([[1.0] + [0.0] * 383, [0.0, 1.0] + [0.0] * 382], dtype="float32")
+        positives = anchors.copy()
+        negatives = np.array([[0.0, 1.0] + [0.0] * 382, [1.0] + [0.0] * 383], dtype="float32")
+
+        weights, loss_history = train_shared_projection(anchors, positives, negatives, seed=42)
+        projected = apply_projection(anchors, weights)
+
+        self.assertEqual(weights.shape, (384, 384))
+        self.assertEqual(len(loss_history), 20)
+        self.assertTrue(np.isfinite(weights).all())
+        self.assertTrue(np.allclose(np.linalg.norm(projected, axis=1), 1))
 
 
 if __name__ == "__main__":
