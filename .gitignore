@@ -3,30 +3,14 @@
 .env.*
 !.env.example
 
-# Source data and generated research artifacts
+# Source data and generated artifacts (recreated by the notebook)
 data/
-artifacts/eda/*.csv
-artifacts/eda/*.png
-artifacts/eda/*.parquet
-artifacts/eda/*.json
-artifacts/eda/*.html
-!artifacts/eda/.gitkeep
-artifacts/catalog/
-artifacts/indexes/
-artifacts/evaluation/
-artifacts/experiments/
-artifacts/final/
+artifacts/
+mlruns/
 
 # Python and Jupyter runtime files
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
-.pytest_cache/
-.mypy_cache/
 .venv/
 venv/
-
-# Later-stage heavyweight artifacts
-*.npy
-mlruns/
-models/
